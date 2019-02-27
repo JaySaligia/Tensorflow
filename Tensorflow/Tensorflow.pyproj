@@ -12,7 +12,7 @@
     <Name>Tensorflow</Name>
     <RootNamespace>Tensorflow</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|virtualenv|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,13 +26,16 @@
     <Compile Include="t0.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tensorflow.py" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="..\..\PythonApplication1\PythonApplication1\venv\">
-      <Id>venv</Id>
+    <Interpreter Include="..\..\..\..\..\..\virtualenv\">
+      <Id>virtualenv</Id>
       <Version>3.7</Version>
-      <Description>venv (Python 3.7 (64-bit))</Description>
+      <Description>virtualenv (Python 3.7 (64-bit))</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
