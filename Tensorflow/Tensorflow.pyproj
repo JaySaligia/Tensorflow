@@ -32,6 +32,9 @@
     <Compile Include="t2.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t3.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tensorflow.py" />
   </ItemGroup>
   <ItemGroup>
