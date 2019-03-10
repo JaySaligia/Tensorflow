@@ -76,7 +76,7 @@ for step in range(max_steps):
 
 num_examples= 10000
 import math
-num_iter = int(match.cell(num_examples / batch_size))
+num_iter = int(math.cell(num_examples / batch_size))
 true_count = 0
 total_sample_count = num_iter * batch_size
 step = 0
@@ -86,7 +86,7 @@ while step < num_iter:
     true_count += np.sum(prediction)
     step += 1
 
-precision = ture_count . total_sample_count
+precision = ture_count/total_sample_count
 print('precision @ 1 = %.3f' % precision)
 
 
