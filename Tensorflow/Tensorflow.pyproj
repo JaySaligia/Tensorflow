@@ -38,6 +38,9 @@
     <Compile Include="t4.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t5.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tensorflow.py" />
   </ItemGroup>
   <ItemGroup>

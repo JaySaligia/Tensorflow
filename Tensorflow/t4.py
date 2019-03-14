@@ -76,7 +76,7 @@ for step in range(max_steps):
 
 num_examples= 10000
 import math
-num_iter = int(math.cell(num_examples / batch_size))
+num_iter = int(math.ceil(num_examples / batch_size))
 true_count = 0
 total_sample_count = num_iter * batch_size
 step = 0
