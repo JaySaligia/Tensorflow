@@ -83,7 +83,7 @@ step = 0
 while step < num_iter:
     image_batch, label_batch = sess.run([images_test, labels_test])
     predictions = sess.run([top_k_op], feed_dict={image_holder: image_batch, label_holder: label_batch})
-    true_count += np.sum(prediction)
+    true_count += np.sum(predictions)
     step += 1
 
 precision = ture_count/total_sample_count
