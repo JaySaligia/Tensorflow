@@ -69,6 +69,7 @@ for step in range(max_steps):
     _, loss_value = sess.run([train_op, loss], feed_dict = {image_holder: image_batch, label_holder: label_batch})
     duration = time.time() - start_time
     if step % 10 == 0:
+       
         examples_per_sec = batch_size / duration
         sec_per_batch = float(duration)
         format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
@@ -86,7 +87,7 @@ while step < num_iter:
     true_count += np.sum(predictions)
     step += 1
 
-precision = ture_count/total_sample_count
+precision = true_count/total_sample_count
 print('precision @ 1 = %.3f' % precision)
 
 

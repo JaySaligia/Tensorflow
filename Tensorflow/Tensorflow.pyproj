@@ -44,7 +44,13 @@
     <Compile Include="t5.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t6.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tensorflow.py" />
+    <Compile Include="天.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="..\..\..\..\..\..\virtualenv\">

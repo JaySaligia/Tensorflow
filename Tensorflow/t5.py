@@ -170,6 +170,8 @@ def train():
     loss = losses(logits, y)
     train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
 
+    top_k_op = tf.nn.in_top_k(logits, y, 1)
+
     init = tf.global_variables_initializer()
     sess = tf.Session()
     sess.run(tf.local_variables_initializer())
@@ -189,12 +191,27 @@ def train():
             format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
             print(format_str % (i, loss_value, examples_per_sec, sec_per_batch))
     
-    images_test, label_test = sess.run([x_batch_test, y_batch_test])
-    _images_test = np.reshape(images_test, [batch_size, 150528])
-    accuracy_test = sess.run(getAccuracy, feed_dict={x: _images_test, y: label_test})
-    print("test accuracy: %g" % accuracy_test)
+    #images_test, label_test = sess.run([x_batch_test, y_batch_test])
+    #_images_test = np.reshape(images_test, [batch_size, 150528])
+    #accuracy_test = sess.run(getAccuracy, feed_dict={x: _images_test, y: label_test})
+    #print("test accuracy: %g" % accuracy_test)
+    num_examples= 200
+    import math
+    num_iter = int(math.ceil(num_examples / batch_size))
+    true_count = 0
+    total_sample_count = num_iter * batch_size
+    step = 0
+    while step < num_iter:
+        image_batch, label_batch = sess.run([x_batch_test, y_batch_test])
+        predictions = sess.run([top_k_op], feed_dict={x: image_batch, y: label_batch})
+        true_count += np.sum(predictions)
+        step += 1
 
-    save_model(sess, i)
+    precision = ture_count/total_sample_count
+    print('precision @ 1 = %.3f' % precision)
+
+
+    #save_model(sess, i)
     coord.request_stop()
     coord.join(threads)
 

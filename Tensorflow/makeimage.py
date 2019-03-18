@@ -54,7 +54,9 @@ def create_record():
             img = Image.open(img_path)  
             img = img.resize((256, 256))    #设置需要转换的图片大小
             #对图片随机裁剪为224*224
-            img = img.crop((random.randint(0,25), random.randint(0,25), 224, 224))
+            x_ = random.randint(0,25)
+            y_ = random.randint(0,25)
+            img = img.crop((x_, y_, x_ + 224, y_ + 224))
             img_raw = img.tobytes()      #将图片转化为原生bytes    
             example = tf.train.Example(  
                features=tf.train.Features(feature={  
