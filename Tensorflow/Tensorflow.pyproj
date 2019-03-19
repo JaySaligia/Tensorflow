@@ -47,6 +47,12 @@
     <Compile Include="t6.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t7.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="t7_1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tensorflow.py" />
     <Compile Include="天.py">
       <SubType>Code</SubType>
