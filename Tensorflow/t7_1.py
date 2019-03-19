@@ -31,7 +31,6 @@ def lda(x_raw, x_raw_1, x_raw_2, x_raw_3 ,d):#x_in为输入矩阵（n*p），d�
         mean_1_tmp = x_in_1 - tf.reshape(mean_1, (-1,1))
         mean_2_tmp = x_in_2 - tf.reshape(mean_2, (-1,1))
         mean_3_tmp = x_in_3 - tf.reshape(mean_3, (-1,1))
-        print(mean_1_tmp)
         mean_diff = tf.concat([mean_1_tmp, mean_2_tmp], 0)
         mean_diff = tf.concat([mean_diff, mean_3_tmp], 0)
         #计算类内散度矩阵Sw

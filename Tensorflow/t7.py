@@ -27,7 +27,6 @@ def lda(x_raw, x_raw_1, x_raw_2, x_raw_3 ,d):#x_raw为输入矩阵（n*p），d�
         mean_1 = tf.reshape(tf.reduce_mean(x_in_1, 0), (1, 3))
         mean_2 = tf.reshape(tf.reduce_mean(x_in_2, 0), (1, 3))
         mean_3 = tf.reshape(tf.reduce_mean(x_in_3, 0), (1, 3))
-        print(mean_1)
         mean_diff = tf.concat([mean_1, mean_1], 0)
         for i in range(98):
             mean_diff = tf.concat([mean_diff, mean_1], 0)
