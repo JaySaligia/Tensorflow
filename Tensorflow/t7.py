@@ -48,12 +48,11 @@ def lda(x_raw, x_raw_1, x_raw_2, x_raw_3 ,d):#x_raw为输入矩阵（n*p），d�
         e_index = tf.math.top_k(e, sorted=True, k =d)[1]
         #取前d个最大特征向量
         v_lda = tf.gather(v, indices=e_index)
-        #得到pca结果矩阵
+        #得到lda结果矩阵
         x_lda = tf.matmul(x_in, v_lda, transpose_b=True)        
         sess = tf.Session()
         #转为numpy矩阵
         x_lda_np = x_lda.eval(session=sess)
-    #return sess.run(x_pca)
     return x_lda_np
 
 x_raw = make_matrix(filename)

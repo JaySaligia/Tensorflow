@@ -26,6 +26,9 @@
     <Compile Include="makeimage.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="module1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="t0.py">
       <SubType>Code</SubType>
     </Compile>
@@ -51,6 +54,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="t7_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="t8.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tensorflow.py" />
