@@ -35,6 +35,9 @@
     <Compile Include="t1.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="t10.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="t2.py">
       <SubType>Code</SubType>
     </Compile>
@@ -57,6 +60,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="t8.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="t9.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tensorflow.py" />
