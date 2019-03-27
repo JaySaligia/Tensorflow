@@ -4,13 +4,15 @@ import math
 import time
 import tensorflow as tf
 import numpy as np
-
-batch_size = 32
+import os
+from tensorflow.python.framework import graph_util
+batch_size = 10
 num_batches = 100
-max_step = 5000
+max_step = 3000
 
 def print_activations(t):
     print(t.op.name, ' ', t.get_shape().as_list())
+
 
 #增加L2正则化的loss
 def variable_with_weight_loss(shape, stddev, w1):
@@ -83,15 +85,15 @@ def inference(images):#接受原始输入为224*224*3；256*256随机截取
 def fully_connected_layer(pool):#全连接层，共三层
     reshape = tf.reshape(pool, [batch_size, -1])
     dim = reshape.get_shape()[1].value
-    weight1 = variable_with_weight_loss(shape=[dim, 384], stddev=0.04, w1=0.004)
-    bias1 = tf.Variable(tf.constant(0.1, shape=[384]))
+    weight1 = variable_with_weight_loss(shape=[dim, 4096], stddev=0.04, w1=0.004)
+    bias1 = tf.Variable(tf.constant(0.1, shape=[4096]))
     local1 = tf.nn.relu(tf.matmul(reshape, weight1) + bias1)
 
-    weight2 = variable_with_weight_loss(shape=[384, 196], stddev=0.04, w1=0.004)
-    bias2 = tf.Variable(tf.constant(0.1, shape=[196]))
+    weight2 = variable_with_weight_loss(shape=[4096, 2048], stddev=0.04, w1=0.004)
+    bias2 = tf.Variable(tf.constant(0.1, shape=[2048]))
     local2 = tf.nn.relu(tf.matmul(local1, weight2) + bias2)
 
-    weight3 = variable_with_weight_loss(shape=[196, 28], stddev=1/192.0, w1=0.0)
+    weight3 = variable_with_weight_loss(shape=[2048, 28], stddev=1/192.0, w1=0.0)
     bias3 = tf.Variable(tf.constant(0.0, shape=[28]))
     logits = tf.add(tf.matmul(local2, weight3), bias3)
 
@@ -147,21 +149,28 @@ def read_test_data():
     img_test = features['image']
     images_test = tf.decode_raw(img_test, tf.uint8)
     images_test = tf.reshape(images_test, [224, 224, 3])
+
     labels_test = tf.cast(features['label'], tf.int64)
     labels_test = tf.cast(labels_test, tf.int64)
     labels_test = tf.one_hot(labels_test, 28)
     return images_test, labels_test
+def save_model(sess, step):
+    MODEL_SAVE_PATH = ""
+    MODEL_NAME = "model.ckpt"
+    saver = tf.train.Saver()
+    saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=step)
 
 def train():
     x_train, y_train = read_train_data()
     x_test, y_test = read_test_data()
-    x_batch_train, y_batch_train = tf.train.shuffle_batch([x_train, y_train], batch_size=BATCH_SIZE, capacity=200,
+    x_batch_train, y_batch_train = tf.train.shuffle_batch([x_train, y_train], batch_size=batch_size, capacity=200,
                                                           min_after_dequeue=100, num_threads=3)
-    x_batch_test, y_batch_test = tf.train.shuffle_batch([x_test, y_test], batch_size=BATCH_SIZE, capacity=200,
+    x_batch_test, y_batch_test = tf.train.shuffle_batch([x_test, y_test], batch_size=batch_size, capacity=200,
                                                         min_after_dequeue=100, num_threads=3)
     x = tf.placeholder(tf.float32, shape=[None, 150528])#224*224*3
     y = tf.placeholder(tf.int64, shape=[None, 28])
-
+    #x = tf.placeholder(tf.float32, [batch_size, 224, 224, 3])
+    #y = tf.placeholder(tf.int32, [batch_size])
     images = tf.reshape(x, shape=[batch_size, 224, 224, 3])
 
     logits = inference(images)
@@ -169,14 +178,11 @@ def train():
     global_step = tf.Variable(0, name='global_step')
     loss = losses(logits, y)
     train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
-
-    top_k_op = tf.nn.in_top_k(logits, y, 1)
-
+    #top_k_op = tf.nn.in_top_k(logits, [batch_size], 1)
     init = tf.global_variables_initializer()
     sess = tf.Session()
-    sess.run(tf.local_variables_initializer())
-    sess.run(tf.global_variables_initializer())
     sess.run(init)
+    sess.run(tf.local_variables_initializer())
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
     for i in range(max_step):
@@ -186,35 +192,74 @@ def train():
         _, loss_value = sess.run([train_op, loss], feed_dict={x: _images_train,y: label_train})
         duration = time.time() - start_time
         if i % 10 == 0:
+            accuracy = sess.run(getAccuracy, feed_dict={x: _images_train, y: label_train})
             example_per_sec = batch_size / duration
             sec_per_batch = float(duration)
-            format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
-            print(format_str % (i, loss_value, examples_per_sec, sec_per_batch))
+           
+            format_str = ('step %d,loss = %.2f, accuracy = %.2f (%.1f examples/sec; %.3f sec/batch)')
+            print(format_str % (i, loss_value, accuracy, example_per_sec, sec_per_batch ))
+    for i in range(10):
+        images_test, label_test = sess.run([x_batch_test, y_batch_test])
+        _images_test = np.reshape(images_test, [batch_size, 150528])
+        accuracy_test = sess.run(getAccuracy, feed_dict={x: _images_test, y: label_test})
+        print("test accuracy: %g" % accuracy_test)
     
-    #images_test, label_test = sess.run([x_batch_test, y_batch_test])
-    #_images_test = np.reshape(images_test, [batch_size, 150528])
-    #accuracy_test = sess.run(getAccuracy, feed_dict={x: _images_test, y: label_test})
-    #print("test accuracy: %g" % accuracy_test)
-    num_examples= 200
+
+
+    #save_model(sess, max_step)
+    tf.saved_model.simple_save(session=sess,
+    export_dir="pb",
+    inputs={"x": x, "y": y},
+    outputs={"logits": logits})
+    coord.request_stop()
+    coord.join(threads)
+
+def train1():
+    x_train, y_train = read_train_data()
+    x_test, y_test = read_test_data()
+    images_train,labels_train = tf.train.shuffle_batch([x_train, y_train], batch_size=batch_size, capacity=200,
+                                                          min_after_dequeue=100, num_threads=3)
+    images_test, labels_test = tf.train.shuffle_batch([x_test, y_test], batch_size=batch_size, capacity=200,
+                                                        min_after_dequeue=100, num_threads=3)
+    image_holder = tf.placeholder(tf.float32, [batch_size, 224, 224, 3])
+    label_holder = tf.placeholder(tf.int32, [batch_size, 28])
+    
+    logits = inference(image_holder)
+    loss = losses(logits, label_holder)
+    train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
+    top_k_op = tf.nn.in_top_k(logits, label_holder, 1)
+    sess= tf.InteractiveSession()
+    tf.global_variables_initializer().run()
+    tf.train.start_queue_runners()
+
+    for step in range(max_step):
+        start_time = time.time()
+        image_batch, label_batch = sess.run([images_train, labels_train])
+        _, loss_value = sess.run([train_op, loss], feed_dict = {image_holder: image_batch, label_holder: label_batch})
+        duration = time.time() - start_time
+        if step % 10 == 0:
+            examples_per_sec = batch_size / duration
+            sec_per_batch = float(duration)
+            format_str = ('step %d,loss = %.2f (%.1f examples/sec; %.3f sec/batch)')
+            print(format_str % (step, loss_value, examples_per_sec, sec_per_batch))
+
+    num_examples= 100
     import math
     num_iter = int(math.ceil(num_examples / batch_size))
     true_count = 0
     total_sample_count = num_iter * batch_size
     step = 0
     while step < num_iter:
-        image_batch, label_batch = sess.run([x_batch_test, y_batch_test])
-        predictions = sess.run([top_k_op], feed_dict={x: image_batch, y: label_batch})
+        image_batch, label_batch = sess.run([images_test, labels_test])
+        predictions = sess.run([top_k_op], feed_dict={image_holder: image_batch, label_holder: label_batch})
         true_count += np.sum(predictions)
         step += 1
 
-    precision = ture_count/total_sample_count
+    precision = true_count/total_sample_count
     print('precision @ 1 = %.3f' % precision)
-
-
-    #save_model(sess, i)
-    coord.request_stop()
-    coord.join(threads)
 
 train()
             
+
+ 
 

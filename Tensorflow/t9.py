@@ -1,8 +1,22 @@
 #Inception Net
+from datetime import datetime
+import math
+import time
 import tensorflow as tf
+import numpy as np
+import os
+from tensorflow.python.framework import graph_util
 slim = tf.contrib.slim
 trunc_normal = lambda stddev : tf.truncated_normal_initializer(0.0, stddev)#匿名函数
-
+batch_size = 32
+num_batches = 100
+max_step = 3000
+def variable_with_weight_loss(shape, stddev, w1):
+    var = tf.Variable(tf.truncated_normal(shape, stddev=stddev))
+    if w1 is not None:
+        weight_loss = tf.multiply(tf.nn.l2_loss(var), w1, name='weight_loss')
+        tf.add_to_collection('losses', weight_loss)
+    return var
 def inception_v3_arg_scope(
     weight_decay = 0.00004,
     stddev = 0.1,
@@ -219,7 +233,7 @@ def inception_v3_base(inputs, scope=None):
             return net, end_points
 
 def inception_v3(inputs,
-                 num_classes=1000,
+                 num_classes=28,
                  is_training=True,
                  dropout_keep_prob=0.8,
                  prediction_fn=slim.softmax,
@@ -250,16 +264,137 @@ def inception_v3(inputs,
                 end_points['Predicitons'] = prediction_fn(logits, scope='Predictions')
     return logits, end_points
 
-batch_size = 32
-height, width = 299,299
-inputs = tf.random_uniform((batch_size, height, width, 3))
-with slim.arg_scope(inception_v3_arg_scope()):
-    logits, end_points = inception_v3(inputs, is_training=False)
+#batch_size = 32
+#height, width = 299,299
+#inputs = tf.random_uniform((batch_size, height, width, 3))
+#with slim.arg_scope(inception_v3_arg_scope()):
+#    logits, end_points = inception_v3(inputs, is_training=False)
 
-init = tf.global_variables_initializer()
-sess = tf.Session()
-sess.run(init)
-num_batches = 100
-time_tensorflow_run(sess, logits, "Forward")
+#init = tf.global_variables_initializer()
+#sess = tf.Session()
+#sess.run(init)
+#num_batches = 100
+#time_tensorflow_run(sess, logits, "Forward")
+def losses(logits, labels):
+    labels = tf.cast(labels, tf.int64)
+    #cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels, name='cross_entropy_per_example')
+    cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=labels))
+    cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
+    tf.add_to_collection('losses', cross_entropy_mean)
+    return tf.add_n(tf.get_collection('losses'), name='total_loss')
+
+def get_accuracy(logits, label):
+    current = tf.cast(tf.equal(tf.argmax(logits, 1), tf.argmax(label, 1)), 'float')
+    accuracy = tf.reduce_mean(current)
+    return accuracy
+
+def read_train_data():
+    reader = tf.TFRecordReader()
+    filename_train = tf.train.string_input_producer(["commodity_train.tfrecords"])
+    _, serialized_example_test = reader.read(filename_train)
+    features = tf.parse_single_example(
+        serialized_example_test,
+        features={
+            'label': tf.FixedLenFeature([], tf.int64),
+            'image': tf.FixedLenFeature([], tf.string),
+            }
+        )
+
+    img_train = features['image']
+    images_train = tf.decode_raw(img_train, tf.uint8)
+    images_train = tf.reshape(images_train, [299, 299, 3])
+    labels_train = tf.cast(features['label'], tf.int64)
+    labels_train = tf.cast(labels_train, tf.int64)
+    labels_train = tf.one_hot(labels_train, 28)
+    return images_train, labels_train
+#读测试集
+def read_test_data():
+    reader = tf.TFRecordReader()
+    filename_test = tf.train.string_input_producer(["commodity_test.tfrecords"])
+    _, serialized_example_test = reader.read(filename_test)
+    features = tf.parse_single_example(
+        serialized_example_test,
+        features={
+            'label': tf.FixedLenFeature([], tf.int64),
+            'image': tf.FixedLenFeature([], tf.string),
+            }
+        )
+
+    img_test = features['image']
+    images_test = tf.decode_raw(img_test, tf.uint8)
+    images_test = tf.reshape(images_test, [299, 299, 3])
+
+    labels_test = tf.cast(features['label'], tf.int64)
+    labels_test = tf.cast(labels_test, tf.int64)
+    labels_test = tf.one_hot(labels_test, 28)
+    return images_test, labels_test
+def save_model(sess, step):
+    MODEL_SAVE_PATH = ""
+    MODEL_NAME = "model.ckpt"
+    saver = tf.train.Saver()
+    saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=step)
+
+def train():
+    x_train, y_train = read_train_data()
+    x_test, y_test = read_test_data()
+    x_batch_train, y_batch_train = tf.train.shuffle_batch([x_train, y_train], batch_size=batch_size, capacity=200,
+                                                          min_after_dequeue=100, num_threads=3)
+    x_batch_test, y_batch_test = tf.train.shuffle_batch([x_test, y_test], batch_size=batch_size, capacity=200,
+                                                        min_after_dequeue=100, num_threads=3)
+    x = tf.placeholder(tf.float32, shape=[None, 268203])#299*299*3
+    y = tf.placeholder(tf.int64, shape=[None, 28])
+    #x = tf.placeholder(tf.float32, [batch_size, 224, 224, 3])
+    #y = tf.placeholder(tf.int32, [batch_size])
+    images = tf.reshape(x, shape=[batch_size, 299, 299, 3])
+
+    logits, end_points = inception_v3(images, is_training=True)
+   
+    getAccuracy = get_accuracy(logits, y)
+    global_step = tf.Variable(0, name='global_step')
+    loss = losses(logits, y)
+    train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
+    #top_k_op = tf.nn.in_top_k(logits, [batch_size], 1)
+    init = tf.global_variables_initializer()
+    sess = tf.Session()
+    sess.run(init)
+    sess.run(tf.local_variables_initializer())
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    for i in range(max_step):
+        start_time = time.time()
+        images_train, label_train = sess.run([x_batch_train, y_batch_train])
+        _images_train = np.reshape(images_train, [batch_size, 268203])
+        _, loss_value = sess.run([train_op, loss], feed_dict={x: _images_train,y: label_train})
+        duration = time.time() - start_time
+        if i % 10 == 0:
+            accuracy = sess.run(getAccuracy, feed_dict={x: _images_train, y: label_train})
+            example_per_sec = batch_size / duration
+            sec_per_batch = float(duration)
+           
+            format_str = ('step %d,loss = %.2f, accuracy = %.2f (%.1f examples/sec; %.3f sec/batch)')
+            print(format_str % (i, loss_value, accuracy, example_per_sec, sec_per_batch ))
+    for i in range(10):
+        images_test, label_test = sess.run([x_batch_test, y_batch_test])
+        _images_test = np.reshape(images_test, [batch_size, 268203])
+        accuracy_test = sess.run(getAccuracy, feed_dict={x: _images_test, y: label_test})
+        print("test accuracy: %g" % accuracy_test)
+    
+
+
+    #save_model(sess, max_step)
+    tf.saved_model.simple_save(session=sess,
+    export_dir="pb",
+    inputs={"x": x, "y": y},
+    outputs={"logits": logits})
+    coord.request_stop()
+    coord.join(threads)
+
+
+train()
+            
+
+ 
+
+
 
 
