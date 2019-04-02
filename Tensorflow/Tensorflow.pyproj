@@ -29,50 +29,44 @@
     <Compile Include="makeimage_2.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="module1.py">
+    <Compile Include="minst_softmax.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t0.py">
+    <Compile Include="minst_auteencoder.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t1.py">
+    <Compile Include="LPP.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t10.py">
+    <Compile Include="minst_multiperceptron.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t2.py">
+    <Compile Include="simpleCNN.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t3.py">
+    <Compile Include="CIFAR10_CNN.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t4.py">
+    <Compile Include="AlexNet.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t5.py">
+    <Compile Include="PCA.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t6.py">
+    <Compile Include="LDA.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t7.py">
+    <Compile Include="LDA_2.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t7_1.py">
+    <Compile Include="DNE.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="t8.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="t9.py">
+    <Compile Include="InceptionNet.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tensorflow.py" />
     <Compile Include="transferlearing.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="天.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
