@@ -26,6 +26,7 @@
     <Compile Include="HMM.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="HMM_Front.py" />
     <Compile Include="HMM_Viterbi.py">
       <SubType>Code</SubType>
     </Compile>

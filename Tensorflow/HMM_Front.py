@@ -27,7 +27,7 @@ def front_sum(t, q):
     return total
 
 
-def cal():
+def calculate():
     for t in range(1, T):
         for q in range(N):
             a[t][q] = front_sum(t, q) * B[q][O[t]]
