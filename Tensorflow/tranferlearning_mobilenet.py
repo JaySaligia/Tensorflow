@@ -5,21 +5,21 @@ import tensorflow as tf
 from tensorflow.python.platform import gfile
 import tensorflow.contrib.slim as slim
 
-import tensorflow.contrib.slim.python.slim.nets.inception_v3 as inception_v3
+from tensorflow.models.research.slim.nets import mobilenet_v1
 
 INPUT_DATA = r"C:\tmpimage\commodity_processed_data.npy"
-TRAIN_FILE_CKPT = r"C:\tmpimage\commodity_model.ckpt"
+TRAIN_FILE_CKPT = r"C:\tmpimage\mobilenet\commodity_model.ckpt"
 TRAIN_FILE_PB = r"commodity_graph.pb"
-TRAIN_FILE_PB_PATH = "C:\\tmpimage\\"
-CKPT_FILE = r"C:\tmpimage\inception_v3.ckpt"
+TRAIN_FILE_PB_PATH = "C:\\tmpimage\\mobilenet\\"
+CKPT_FILE = r"C:\tmpimage\mobilenet\mobilenet_v1_1.0_224.ckpt"
 
 LEARNING_RATE = 0.0001
 STEPS = 2
 BATCH = 32
 N_CLASSES = 28
 
-CHECKPOINT_EXCLUDE_SCOPES = 'InceptionV3/Logits,InceptionV3/AuxLogits'
-TRAINABLE_SCOPES = 'InceptionV3/Logits,InceptionV3/AuxLogits'
+CHECKPOINT_EXCLUDE_SCOPES = 'MobilenetV1/Logits'
+TRAINABLE_SCOPES = 'MobilenetV1/Logits'
 
 def get_tuned_variables():
     exclusions = [scope.strip() for scope in CHECKPOINT_EXCLUDE_SCOPES.split(',')]
@@ -54,11 +54,11 @@ def main():
     testing_labels = processed_data[5]
     print("%d training examples, %d validation examples and %d testing examples." %(n_training_example, len(validation_labels), len(testing_labels)))
 
-    images = tf.placeholder(tf.float32, [None, 299, 299, 3], name = 'input_images')
+    images = tf.placeholder(tf.float32, [None, 224, 224, 3], name = 'input_images')
     labels = tf.placeholder(tf.int64, [None], name = 'labels')
 
-    with slim.arg_scope(inception_v3.inception_v3_arg_scope()):
-        logits, _ = inception_v3.inception_v3(
+    with slim.arg_scope(mobilent_v1.mobilent_v1_arg_scope()):
+        logits, _ = mobilent_v1.mobilent_v1(
             images, num_classes=N_CLASSES)
     trainable_variables = get_trainable_variables()
     tf.losses.softmax_cross_entropy(
@@ -107,3 +107,4 @@ def main():
         print('Final test accuracy = %.1f%%' % (test_accuracy * 100))
 
 main()
+

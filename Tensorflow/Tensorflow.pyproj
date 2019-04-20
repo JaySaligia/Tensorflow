@@ -23,6 +23,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="HMM.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HMM_Viterbi.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="makeimage.py">
       <SubType>Code</SubType>
     </Compile>
@@ -39,6 +45,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="minst_multiperceptron.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="shownodeinfo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="simpleCNN.py">
@@ -66,6 +75,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tensorflow.py" />
+    <Compile Include="tranferlearning_mobilenet.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="transferlearing.py">
       <SubType>Code</SubType>
     </Compile>
