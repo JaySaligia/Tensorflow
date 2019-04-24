@@ -13,7 +13,7 @@ O = np.zeros((T, ), dtype=int)#观测序列
 a = np.zeros((T, N), dtype=float)
 
 A = np.array([[0.8, 0.3, 0.4],[0.1, 0.4, 0.2],[0.1, 0.3, 0.4]])
-B = np.array([[0.8, 0.2, 0.1], [0.1, 0.6, 0.3], [0.1, 0.2, 0.6]])
+B = np.array([[0.8, 0.2, 0.1], [0.1, 0.5, 0.2], [0.1, 0.3, 0.7]])
 P = np.array([0.64, 0.19, 0.27])
 O = np.array([0, 0, 1, 2, 1, 2, 1, 0])
 def init():
@@ -35,5 +35,7 @@ def calculate():
     for i in range(N):
         total += a[t][i]
     return total
+init()
+print("概率为：", calculate());
 
 
