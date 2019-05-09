@@ -63,6 +63,7 @@ def lpp(x_raw, d):#x_raw为输入矩阵（n*p），d为维数
         x_lpp_np = x_lpp.eval(session=sess)
     return x_lpp_np
 
+
 result = lpp(x_raw, d)
 
 def showmodel():

@@ -34,9 +34,35 @@ def pca(x_raw, d):#x_in为输入矩阵（n*p），d为维数
         x_pca_np = x_pca.eval(session=sess)
     return x_pca_np
 
-x_raw = make_matrix(filename)
-d = int(input("输入维度"))
-result = pca(x_raw, d)
+#x_raw = make_matrix(filename)
+x_raw = np.loadtxt("breast.txt")
+label = x_raw[:,9].astype(np.int32)
+x_raw = x_raw[:,:9]
+#x_raw[:, 0] = x_raw[:, 0] * 7.9 * 7.9
+#_raw[:, 1] = x_raw[:, 1] * 9.3 * 9.3
+#x_raw[:, 2] = x_raw[:, 2] * 8.8 * 8.8
+#x_raw[:, 3] = x_raw[:, 3] * 8.1 * 8.1
+#x_raw[:, 4] = x_raw[:, 4] * 4.9 * 4.9
+#x_raw[:, 5] = x_raw[:, 5] * 13.1 * 13.1
+#_raw[:, 6] = x_raw[:, 6] * 5.9 * 5.9
+#x_raw[:, 7] = x_raw[:, 7] * 9.3 * 9.3
+#x_raw[:, 8] = x_raw[:, 8] * 2.9 * 2.9
+#x_raw = x_raw / 30
+print(x_raw)
+#d = int(input("输入维度"))
+result = pca(x_raw, 2)
+print(result)
+
+def showmodel2():
+    #model = plt.subplot(111, projection='3d')
+    for i in range(label.shape[0]):
+        if label[i] == 2:
+            tmp = result[i]
+            plt.scatter(tmp[0], tmp[1],  c = 'blue')
+        else:
+            tmp = result[i]
+            plt.scatter(tmp[0], tmp[1], c = 'orange')
+    plt.show()
 
 def showmodel():
     if (d == 2):#二维分布  
@@ -65,4 +91,4 @@ def showmodel():
         plt.scatter(result_3[:,0], result_3[:,1], result_3[:,2], c='red')
         plt.show()
 
-showmodel()
+showmodel2()

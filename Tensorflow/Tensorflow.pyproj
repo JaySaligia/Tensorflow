@@ -23,6 +23,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cluster.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HMM.py">
       <SubType>Code</SubType>
     </Compile>
@@ -95,6 +98,7 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="breast.txt" />
     <Content Include="label.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
