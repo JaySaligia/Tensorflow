@@ -26,6 +26,9 @@
     <Compile Include="Cluster.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Cluster_handin.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HMM.py">
       <SubType>Code</SubType>
     </Compile>

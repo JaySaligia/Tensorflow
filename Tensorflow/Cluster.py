@@ -21,21 +21,26 @@ def variance(a):
         var = np.var(tmp)
         print("var" + str(i) + ": " + str(var))
     
+def std(a):
+    print(np.std(a, axis=0))
+
+
 
 def preprocession():#预处理
     a_label = np.loadtxt('breast.txt')
     label = a_label[:, 9].astype(np.int32)
     a = np.delete(a_label, -1, axis=1)
+    std(a)
     b = np.zeros((699,9), dtype = float)
-    b[:, 0] = a[:, 0]
+    b[:, 0] = a[:, 0] 
     b[:, 1] = a[:, 1]
     b[:, 2] = a[:, 2]
-    b[:, 3] = a[:, 3] 
+    b[:, 3] = a[:, 3]
     b[:, 4] = a[:, 4] * 0.9
-    b[:, 5] = a[:, 5] * 1.2
+    b[:, 5] = a[:, 5]
     b[:, 6] = a[:, 6]
     b[:, 7] = a[:, 7]
-    b[:, 8] = a[:, 8] * 0
+    b[:, 8] = a[:, 8] * 0.5
 
     a[:, 0] = a[:, 0] * 7.9 * 7.9 * 7.9
     a[:, 1] = a[:, 1] * 9.3 * 9.3 * 9.3
@@ -137,6 +142,8 @@ def core2(now):
 def core3(now):#update dump arg
     length = len(now)
     print("having " + str(length) + " clusters")
+    if length == 1:
+        return np.zeros(699, dtype = np.int)
     if length == 2:
        ret = np.zeros(699, dtype = np.int)
        for i in range(length):
@@ -153,13 +160,12 @@ def core3(now):#update dump arg
     group_count = 0
     dist_count = 0
     dist_total = 0
-    for i in range(length):
-        for j in range(i+1, length):
-            dist = caldist(now[i].cluster_v, now[j].cluster_v)
-            dist_count += dist
-            dist_total += 1
-    avg = dist_count / dist_total
-
+    #for i in range(length):
+    #    for j in range(i+1, length):
+    #        dist = caldist(now[i].cluster_v, now[j].cluster_v)
+    #        dist_count += dist
+    #        dist_total += 1
+    #avg = dist_count / dist_total
     for i in range(length):
         dist_min = 100000
         match_num = 0
@@ -170,32 +176,32 @@ def core3(now):#update dump arg
                     if dist < dist_min:
                         dist_min = dist
                         match_num = j
-            if dist_min > avg:
-                    node = Node(now[i].point_num)
-                    next.append(node)
-                    groups[i] = group_count
-                    group_count += 1
-            else:
-                if groups[match_num] == -1:
+            #if dist_min > avg:
+            #        node = Node(now[i].point_num)
+            #        next.append(node)
+            #        groups[i] = group_count
+            #        group_count += 1
+            #else:
+            if groups[match_num] == -1:
                     node = Node(now[i].point_num + now[match_num].point_num)
                     next.append(node)
                     groups[i] = group_count
                     groups[match_num] = group_count
                     group_count += 1
-                else:
+            else:
                     next[groups[match_num]].point_num += now[i].point_num
+                    groups[i] = groups[match_num]
     for i in next:
         i.terrianinfo()
     #print("dist_mean: " + str(dist_total / dist_count))
     return core3(next)
 
 
-
 a ,label = preprocession()
 test = []
 print(label)
 count = 0
-
+#std(a)
 for i in range(a.shape[0]):
     node = Node([i])
     node.terrianinfo()
